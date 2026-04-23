@@ -5,13 +5,28 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { resetPasswordSchema, type ResetPasswordInput } from "@/schemas/auth.schema";
+import type { ResetPasswordInput } from "@/schemas/auth.schema";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, AlertCircle, Eye, EyeOff, CheckCircle } from "lucide-react";
 import axios from "axios";
+
+type ResetPasswordFormInput = Omit<ResetPasswordInput, "token">;
+
+const resetPasswordFormSchema = z.object({
+  newPassword: z
+    .string()
+    .min(1, "New password is required")
+    .min(8, "Password must be at least 8 characters")
+    .max(128, "Password must not exceed 128 characters"),
+  confirmPassword: z.string().min(1, "Please confirm your password"),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -29,14 +44,14 @@ export default function ResetPasswordPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ResetPasswordInput>({
-    resolver: zodResolver(resetPasswordSchema),
+  } = useForm<ResetPasswordFormInput>({
+    resolver: zodResolver(resetPasswordFormSchema),
   });
 
   useEffect(() => {
     const validateToken = async () => {
       try {
-        await axios.post("/api/auth/reset-password/validate", { token });
+        await axios.get(`/api/auth/reset-password/validate?token=${token}`);
         setIsValid(true);
       } catch {
         setIsValid(false);
@@ -51,13 +66,13 @@ export default function ResetPasswordPage() {
     }
   }, [token]);
 
-  const onSubmit = async (data: ResetPasswordInput) => {
+  const onSubmit = async (data: ResetPasswordFormInput) => {
     setError(null);
     setIsLoading(true);
 
     try {
-      await axios.post("/api/auth/reset-password", data);
-      router.push("/auth/login?reset=success");
+      await axios.post("/api/auth/reset-password", { ...data, token });
+      router.push("/login?reset=success");
     } catch (_err) {
       setError("Failed to reset password. Please try again.");
     } finally {
@@ -81,7 +96,7 @@ export default function ResetPasswordPage() {
           <AlertDescription>{error || "Invalid reset link"}</AlertDescription>
         </Alert>
         <div className="text-center">
-          <Link href={{ pathname: "/auth/forgot-password" }} className="text-sm text-primary hover:underline">
+          <Link href={{ pathname: "/forgot-password" }} className="text-sm text-primary hover:underline">
             Request a new reset link
           </Link>
         </div>

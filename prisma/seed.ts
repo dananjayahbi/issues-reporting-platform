@@ -1,4 +1,4 @@
-import { PrismaClient, UserRole, IssueSeverity, IssuePriority } from "@prisma/client";
+import { PrismaClient, UserRole } from "@prisma/client";
 import * as bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -41,11 +41,11 @@ async function main() {
   // ─── Default Modules ────────────────────────────────────────────────────────
   const modules = ["POS", "Inventory", "Billing", "Reports", "Transport", "Settings"];
 
-  for (const module of modules) {
+  for (const moduleName of modules) {
     await prisma.systemSetting.upsert({
-      where: { key: `module:${module}` },
+      where: { key: `module:${moduleName}` },
       update: {},
-      create: { key: `module:${module}`, value: module },
+      create: { key: `module:${moduleName}`, value: moduleName },
     });
   }
   console.log(`✅ Created ${modules.length} default modules`);

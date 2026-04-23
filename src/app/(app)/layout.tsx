@@ -9,12 +9,21 @@ import { AppSidebar } from "@/components/layout/AppSidebar";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { CommandPalette } from "@/components/layout/CommandPalette";
 import { SessionGuard } from "@/components/auth/SessionGuard";
+import { AppSessionProvider } from "@/components/providers/AppSessionProvider";
 import { useUIStore } from "@/store/uiStore";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { MobileNav } from "@/components/layout/MobileNav";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <AppSessionProvider>
+      <AppLayoutContent>{children}</AppLayoutContent>
+    </AppSessionProvider>
+  );
+}
+
+function AppLayoutContent({ children }: { children: React.ReactNode }) {
   const sessionResult = useSession();
   const status = sessionResult?.status;
   const router = useRouter();
@@ -23,7 +32,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/auth/login");
+      router.push("/login");
     }
   }, [status, router]);
 

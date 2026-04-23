@@ -1,0 +1,126 @@
+
+> llc-itp@0.1.0 check:workspace
+> node check-workspace.mjs
+
+
+========================================================================
+Running ESLint
+========================================================================
+
+========================================================================
+Running TypeScript
+========================================================================
+
+> llc-itp@0.1.0 typecheck
+> tsc --noEmit
+
+
+========================================================================
+Running Next build
+========================================================================
+
+> llc-itp@0.1.0 build
+> next build
+
+   ▲ Next.js 15.5.15
+   - Environments: .env
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+   Creating an optimized production build ...
+(node:32104) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///E:/work_git_repos/issues-reporting-platform/tailwind.config.ts?id=1776961436280 is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to E:\work_git_repos\issues-reporting-platform\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ Compiled successfully in 4.8s
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/29) ...
+   Generating static pages (7/29) 
+   Generating static pages (14/29) 
+   Generating static pages (21/29) 
+ ✓ Generating static pages (29/29)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ƒ /                                    4.85 kB         144 kB
+├ ○ /_not-found                            998 B         103 kB
+├ ○ /accept-invite                       3.14 kB         157 kB
+├ ƒ /admin                                5.7 kB         197 kB
+├ ƒ /api/auth/[...nextauth]                239 B         102 kB
+├ ƒ /api/auth/accept-invite                239 B         102 kB
+├ ƒ /api/auth/accept-invite/validate       239 B         102 kB
+├ ƒ /api/auth/first-login                  239 B         102 kB
+├ ƒ /api/auth/forgot-password              239 B         102 kB
+├ ƒ /api/auth/reset-password               239 B         102 kB
+├ ƒ /api/auth/reset-password/validate      239 B         102 kB
+├ ƒ /api/chat/channels                     239 B         102 kB
+├ ƒ /api/chat/channels/[id]/messages       239 B         102 kB
+├ ƒ /api/dashboard/stats                   239 B         102 kB
+├ ƒ /api/issues                            239 B         102 kB
+├ ƒ /api/issues/[id]                       239 B         102 kB
+├ ƒ /api/issues/[id]/comments              239 B         102 kB
+├ ƒ /api/notifications                     239 B         102 kB
+├ ƒ /api/polls                             239 B         102 kB
+├ ƒ /api/polls/[id]/vote                   239 B         102 kB
+├ ƒ /api/search                            239 B         102 kB
+├ ƒ /api/users                             239 B         102 kB
+├ ƒ /api/users/[id]                        239 B         102 kB
+├ ƒ /api/v1/audit-log                      239 B         102 kB
+├ ƒ /api/v1/chat/channels                  239 B         102 kB
+├ ƒ /api/v1/chat/channels/[id]             239 B         102 kB
+├ ƒ /api/v1/chat/channels/[id]/members     239 B         102 kB
+├ ƒ /api/v1/chat/channels/[id]/messages    239 B         102 kB
+├ ƒ /api/v1/chat/dm/[userId]/messages      239 B         102 kB
+├ ƒ /api/v1/export/issue/[id]              239 B         102 kB
+├ ƒ /api/v1/export/issues                  239 B         102 kB
+├ ƒ /api/v1/issues                         239 B         102 kB
+├ ƒ /api/v1/issues/[id]                    239 B         102 kB
+├ ƒ /api/v1/issues/[id]/activity           239 B         102 kB
+├ ƒ /api/v1/issues/[id]/attachments        239 B         102 kB
+├ ƒ /api/v1/issues/[id]/comments           239 B         102 kB
+├ ƒ /api/v1/issues/[id]/history            239 B         102 kB
+├ ƒ /api/v1/issues/[id]/poll               239 B         102 kB
+├ ƒ /api/v1/media/[filename]               239 B         102 kB
+├ ƒ /api/v1/media/upload                   239 B         102 kB
+├ ƒ /api/v1/notifications                  239 B         102 kB
+├ ƒ /api/v1/notifications/[id]             239 B         102 kB
+├ ƒ /api/v1/polls                          239 B         102 kB
+├ ƒ /api/v1/polls/[id]                     239 B         102 kB
+├ ƒ /api/v1/polls/[id]/vote                239 B         102 kB
+├ ƒ /api/v1/search                         239 B         102 kB
+├ ƒ /api/v1/users                          239 B         102 kB
+├ ƒ /api/v1/users/[id]                     239 B         102 kB
+├ ƒ /chat                                 6.2 kB         190 kB
+├ ○ /first-login                          1.7 kB         158 kB
+├ ○ /forgot-password                     1.38 kB         158 kB
+├ ƒ /issues                              7.73 kB         193 kB
+├ ƒ /issues/[id]                         5.22 kB         147 kB
+├ ƒ /issues/new                          4.98 kB         175 kB
+├ ○ /login                               2.11 kB         144 kB
+├ ƒ /notifications                       5.67 kB         151 kB
+├ ƒ /polls                               5.32 kB         157 kB
+├ ƒ /profile                             7.54 kB         159 kB
+├ ƒ /reset-password/[token]              3.17 kB         161 kB
+└ ƒ /search                              3.52 kB         140 kB
++ First Load JS shared by all             102 kB
+  ├ chunks/1255-5fe68596fe147850.js        46 kB
+  ├ chunks/4bd1b696-f785427dddbba9fb.js  54.2 kB
+  └ other shared chunks (total)             2 kB
+
+
+ƒ Middleware                             35.1 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+
+========================================================================
+Workspace check summary
+========================================================================
+PASS  ESLint (6.0s)
+PASS  TypeScript (5.4s)
+PASS  Next build (32.2s)
+
+All workspace checks passed.

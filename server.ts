@@ -1,7 +1,7 @@
 import { createServer } from "http";
 import { parse } from "url";
 import next from "next";
-import { Server as SocketIOServer, Socket } from "socket.io";
+import { Server as SocketIOServer, type Socket } from "socket.io";
 import { verifyToken } from "@/lib/auth/jwt";
 import { prisma } from "@/lib/db/prisma";
 import cron from "node-cron";

@@ -75,7 +75,7 @@ export function ForgotPasswordForm() {
           <Button
             variant="outline"
             className="w-full"
-            onClick={() => router.push("/auth/login")}
+            onClick={() => router.push("/login")}
           >
             Back to Sign In
           </Button>
@@ -140,7 +140,7 @@ export function ForgotPasswordForm() {
             type="button"
             variant="link"
             className="px-0"
-            onClick={() => router.push("/auth/login")}
+            onClick={() => router.push("/login")}
           >
             Sign in
           </Button>

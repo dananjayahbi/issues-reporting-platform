@@ -15,7 +15,7 @@ export function SessionGuard({ children }: SessionGuardProps) {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/auth/login");
+      router.push("/login");
     }
   }, [status, router]);
 

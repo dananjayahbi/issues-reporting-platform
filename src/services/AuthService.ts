@@ -158,29 +158,22 @@ export class AuthService {
    */
   static async createInviteToken(
     email: string,
-    displayName: string,
+    _displayName: string,
     role: string,
-    invitedBy: string
+    _invitedBy: string
   ): Promise<string> {
     const token = nanoid(32);
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + INVITE_TOKEN_EXPIRY_DAYS);
 
-    // Note: inviteToken model may not exist - this needs schema support
-    try {
-      const inviteData = {
+    await prisma.inviteToken.create({
+      data: {
         token,
         email,
         role,
-        invitedBy,
         expiresAt,
-      };
-      await (prisma.inviteToken as unknown as typeof prisma.auditLog).create({
-        data: inviteData as unknown as Parameters<typeof prisma.auditLog.create>[0]["data"],
-      });
-    } catch (_error) {
-      console.error("InviteToken model not found - this feature requires schema migration");
-    }
+      },
+    });
 
     return token;
   }
@@ -196,21 +189,20 @@ export class AuthService {
     error?: string;
   }> {
     try {
-      const record = await (prisma.inviteToken as unknown as typeof prisma.auditLog).findUnique({
-        where: { token } as unknown as Parameters<typeof prisma.auditLog.findUnique>[0]["where"],
+      const record = await prisma.inviteToken.findUnique({
+        where: { token },
       });
 
       if (!record) {
         return { valid: false, error: "Invalid invite token" };
       }
 
-      if ((record as unknown as { expiresAt: Date }).expiresAt < new Date()) {
+      if (record.expiresAt < new Date()) {
         return { valid: false, error: "Invite token has expired" };
       }
 
-      // Check if user already exists
       const existingUser = await prisma.user.findUnique({
-        where: { email: (record as unknown as { email: string }).email },
+        where: { email: record.email },
       });
 
       if (existingUser) {
@@ -219,9 +211,9 @@ export class AuthService {
 
       return {
         valid: true,
-        email: (record as unknown as { email: string }).email,
-        displayName: ((record as unknown as { displayName?: string }).displayName) || ((record as unknown as { email: string }).email),
-        ...(((record as unknown as { role?: string }).role) ? { role: (record as unknown as { role?: string }).role } : {}),
+        email: record.email,
+        displayName: record.email,
+        ...(record.role ? { role: record.role } : {}),
       };
     } catch (_error) {
       return { valid: false, error: "Invite token validation failed" };
@@ -255,13 +247,10 @@ export class AuthService {
           },
         });
 
-        try {
-          if (validation.email) {
-            const deleteParams = { where: { email: validation.email } };
-            await (tx.inviteToken as unknown as typeof prisma.auditLog).deleteMany(deleteParams as unknown as Parameters<typeof prisma.auditLog.deleteMany>[0]);
-          }
-        } catch (_error) {
-          // InviteToken model may not exist
+        if (validation.email) {
+          await tx.inviteToken.deleteMany({
+            where: { email: validation.email },
+          });
         }
 
         return newUser;

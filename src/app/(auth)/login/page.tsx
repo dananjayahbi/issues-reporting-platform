@@ -45,7 +45,7 @@ export default function LoginPage() {
       const mustChangePassword = (session?.user as { mustChangePassword?: boolean })?.mustChangePassword;
 
       if (mustChangePassword) {
-        router.push("/auth/first-login");
+        router.push("/first-login");
       } else {
         router.push("/");
       }
@@ -90,7 +90,7 @@ export default function LoginPage() {
           <div className="flex items-center justify-between">
             <Label htmlFor="password">Password</Label>
             <Link
-            href={{ pathname: "/auth/forgot-password" }}
+            href={{ pathname: "/forgot-password" }}
               className="text-sm text-primary hover:underline"
             >
               Forgot password?

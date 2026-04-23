@@ -8,7 +8,6 @@ import { Loader2, X } from "lucide-react";
 export function SearchContainer() {
   const {
     query,
-    results,
     total,
     isLoading,
     error,

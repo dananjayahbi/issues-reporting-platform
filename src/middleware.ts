@@ -27,10 +27,11 @@ const PROTECTED_ROUTES = [...AUTH_REQUIRED_ROUTES, ...SUPER_ADMIN_ROUTES];
 
 // Public routes (no auth required)
 const PUBLIC_ROUTES = [
-  "/auth/login",
-  "/auth/forgot-password",
-  "/auth/reset-password",
-  "/auth/first-login",
+  "/login",
+  "/forgot-password",
+  "/reset-password",
+  "/first-login",
+  "/accept-invite",
 ];
 
 export function middleware(request: NextRequest) {
@@ -54,7 +55,7 @@ export function middleware(request: NextRequest) {
 
   // If no session token and route requires auth, redirect to login
   if (!sessionToken) {
-    const loginUrl = new URL("/auth/login", request.url);
+    const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
   }

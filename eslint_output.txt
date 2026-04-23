@@ -1,0 +1,41 @@
+
+E:\work_git_repos\issues-reporting-platform\next-env.d.ts
+  3:1  error  Do not use a triple slash reference for ./.next/types/routes.d.ts, use `import` style instead  @typescript-eslint/triple-slash-reference
+
+E:\work_git_repos\issues-reporting-platform\prisma\seed.ts
+    1:34  warning  'IssueSeverity' is defined but never used. Allowed unused vars must match /^_/u                          @typescript-eslint/no-unused-vars
+    1:49  warning  'IssuePriority' is defined but never used. Allowed unused vars must match /^_/u                          @typescript-eslint/no-unused-vars
+    7:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error                        no-console
+   27:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error                        no-console
+   39:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error                        no-console
+   44:8   error    Do not assign to the variable `module`. See: https://nextjs.org/docs/messages/no-assign-module-variable  @next/next/no-assign-module-variable
+   51:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error                        no-console
+   72:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error                        no-console
+  102:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error                        no-console
+  121:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error                        no-console
+  123:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error                        no-console
+  124:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error                        no-console
+  125:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error                        no-console
+  126:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error                        no-console
+  127:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error                        no-console
+
+E:\work_git_repos\issues-reporting-platform\server.ts
+    4:1   warning  Imports "Socket" are only used as type                                             @typescript-eslint/consistent-type-imports
+   77:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+   92:11  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  240:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  248:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  254:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  264:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  289:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  360:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+E:\work_git_repos\issues-reporting-platform\src\app\(app)\search\SearchContainer.tsx
+  11:5  warning  'results' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+E:\work_git_repos\issues-reporting-platform\tailwind.config.ts
+  114:13  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+✖ 27 problems (3 errors, 24 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

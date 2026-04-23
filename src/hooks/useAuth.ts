@@ -18,7 +18,7 @@ export function useAuth() {
   };
 
   const logout = async () => {
-    await signOut({ callbackUrl: "/auth/login" });
+    await signOut({ callbackUrl: "/login" });
   };
 
   return {

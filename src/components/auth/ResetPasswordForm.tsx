@@ -44,7 +44,7 @@ export function ResetPasswordForm() {
 
     const verifyToken = async () => {
       try {
-        const response = await fetch(`/api/auth/verify-reset-token?token=${token}`);
+        const response = await fetch(`/api/auth/reset-password/validate?token=${token}`);
         setIsValidToken(response.ok);
       } catch {
         setIsValidToken(false);
@@ -119,7 +119,7 @@ export function ResetPasswordForm() {
           <Button
             variant="outline"
             className="w-full"
-            onClick={() => router.push("/auth/forgot-password")}
+            onClick={() => router.push("/forgot-password")}
           >
             Request New Reset Link
           </Button>
@@ -144,7 +144,7 @@ export function ResetPasswordForm() {
           <Button
             variant="outline"
             className="w-full"
-            onClick={() => router.push("/auth/login")}
+            onClick={() => router.push("/login")}
           >
             Sign In with New Password
           </Button>

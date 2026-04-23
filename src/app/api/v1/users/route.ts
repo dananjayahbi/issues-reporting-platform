@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
       validated.role,
       session.user.id ?? ""
     );
-    const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL}/auth/accept-invite?token=${token}`;
+    const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL}/accept-invite?token=${token}`;
     
     await EmailClient.sendInviteEmail(
       validated.email,

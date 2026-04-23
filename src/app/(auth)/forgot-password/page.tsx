@@ -62,7 +62,7 @@ export default function ForgotPasswordPage() {
 
         <div className="text-center">
           <button
-            onClick={() => router.push("/auth/login")}
+            onClick={() => router.push("/login")}
             className="text-sm text-primary hover:underline"
           >
             Return to Sign In
@@ -118,7 +118,7 @@ export default function ForgotPasswordPage() {
 
       <div className="text-center">
         <button
-          onClick={() => router.push("/auth/login")}
+          onClick={() => router.push("/login")}
           className="text-sm text-primary hover:underline"
         >
           Return to Sign In

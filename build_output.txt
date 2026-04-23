@@ -8,19 +8,21 @@
      · optimizePackageImports
 
    Creating an optimized production build ...
- ✓ Compiled successfully in 4.9s
+ ✓ Compiled successfully in 4.2s
    Linting and checking validity of types ...
+
+./src/app/(app)/search/SearchContainer.tsx
+11:5  Warning: 'results' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
    Collecting page data ...
-   Generating static pages (0/34) ...
-   Generating static pages (8/34) 
-Error occurred prerendering page "/notifications". Read more: https://nextjs.org/docs/messages/prerender-error
-Error: No QueryClient set, use QueryClientProvider to set one
-    at f (E:\work_git_repos\issues-reporting-platform\.next\server\chunks\1370.js:5:117134)
-    at <unknown> (E:\work_git_repos\issues-reporting-platform\.next\server\chunks\1370.js:5:107847)
-    at w (E:\work_git_repos\issues-reporting-platform\.next\server\chunks\1370.js:5:109374)
-    at h (E:\work_git_repos\issues-reporting-platform\.next\server\chunks\4613.js:1:230)
-    at M (E:\work_git_repos\issues-reporting-platform\.next\server\chunks\4613.js:1:11259) {
-  digest: '623415034'
+   Generating static pages (0/25) ...
+   Generating static pages (6/25) 
+Error occurred prerendering page "/login". Read more: https://nextjs.org/docs/messages/prerender-error
+TypeError: Cannot destructure property 'data' of '(0 , d.useSession)(...)' as it is undefined.
+    at e (E:\work_git_repos\issues-reporting-platform\.next\server\app\(auth)\login\page.js:1:1132)
+    at v (E:\work_git_repos\issues-reporting-platform\.next\server\app\(auth)\login\page.js:1:2010) {
+  digest: '268822626'
 }
-Export encountered an error on /(app)/notifications/page: /notifications, exiting the build.
+Export encountered an error on /(auth)/login/page: /login, exiting the build.
  ⨯ Next.js build worker exited with code: 1 and signal: null

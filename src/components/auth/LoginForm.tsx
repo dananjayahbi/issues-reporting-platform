@@ -119,7 +119,7 @@ export function LoginForm() {
               type="button"
               variant="link"
               className="px-0"
-              onClick={() => router.push("/auth/forgot-password")}
+              onClick={() => router.push("/forgot-password")}
             >
               Forgot password?
             </Button>
@@ -139,15 +139,7 @@ export function LoginForm() {
       </Form>
 
       <p className="mt-6 text-center text-sm text-slate-600 dark:text-slate-400">
-        {"Don't have an account? "}
-        <Button
-          type="button"
-          variant="link"
-          className="px-0"
-          onClick={() => router.push("/auth/register")}
-        >
-          Sign up
-        </Button>
+        Need access? Contact your system administrator.
       </p>
     </div>
   );
