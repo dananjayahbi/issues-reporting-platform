@@ -1,0 +1,522 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  QA
+  VIEWER
+}
+
+enum IssueStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+  REOPENED
+}
+
+enum IssueSeverity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum IssuePriority {
+  URGENT
+  HIGH
+  NORMAL
+  LOW
+}
+
+enum ChannelType {
+  PUBLIC
+  PRIVATE
+  DIRECT
+}
+
+// ─── User & Auth ─────────────────────────────────────────────────────────────
+
+model User {
+  id                  String    @id @default(cuid())
+  email               String    @unique
+  password            String
+  name                String
+  role                UserRole  @default(VIEWER)
+  avatar              String?
+  isActive            Boolean   @default(true)
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
+  mustChangePassword  Boolean   @default(false)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  sessions           Session[]
+  createdIssues      Issue[]                  @relation("IssueCreator")
+  assignedIssues     IssueAssignment[]
+  comments           Comment[]
+  messages           Message[]
+  reactions          MessageReaction[]
+  readReceipts       MessageReadReceipt[]
+  pollVotes          PollVote[]
+  notifications      Notification[]
+  notificationPrefs  NotificationPreference[]
+  auditLogs          AuditLog[]
+  channelMemberships ChannelMember[]
+  issueVersions      IssueVersion[]
+  issueDrafts        IssueDraft[]
+  channels           Channel[]
+  polls              Poll[]
+  mediaFiles         MediaFile[]
+  issueAttachments   IssueAttachment[]
+  passwordResetTokens PasswordResetToken[]
+
+  @@index([email])
+  @@index([isActive])
+  @@index([role])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+}
+
+// ─── Issue Management ──────────────────────────────────────────────────────────
+
+model Issue {
+  id          String        @id @default(cuid())
+  title       String
+  body        String        @db.Text
+  status      IssueStatus   @default(OPEN)
+  severity    IssueSeverity @default(MEDIUM)
+  priority    IssuePriority @default(NORMAL)
+  category    String
+  module      String
+  environment String        @default("production")
+  tags        String[]
+  createdById String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  resolvedAt  DateTime?
+
+  createdBy   User              @relation("IssueCreator", fields: [createdById], references: [id])
+  assignees   IssueAssignment[]
+  versions    IssueVersion[]
+  drafts      IssueDraft[]
+  comments    Comment[]
+  attachments Attachment[]
+  issueAttachments IssueAttachment[]
+  linkedFrom  IssueLink[]       @relation("IssueLinkSource")
+  linkedTo    IssueLink[]       @relation("IssueLinkTarget")
+  polls       Poll[]
+  auditLogs   AuditLog[]
+  issueTag    IssueTag?         @relation(fields: [issueTagId], references: [id])
+  issueTagId  String?
+
+  @@index([status])
+  @@index([severity])
+  @@index([priority])
+  @@index([category])
+  @@index([module])
+  @@index([createdById])
+  @@index([createdAt])
+  @@index([resolvedAt])
+}
+
+model IssueTag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  color     String
+  createdAt DateTime @default(now())
+
+  issues Issue[]
+
+  @@index([name])
+}
+
+model IssueAssignment {
+  id         String   @id @default(cuid())
+  userId     String
+  issueId    String
+  assignedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  issue Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, issueId])
+  @@index([userId])
+  @@index([issueId])
+}
+
+model IssueLink {
+  id            String @id @default(cuid())
+  sourceIssueId String
+  targetIssueId String
+  linkType      String
+
+  sourceIssue Issue @relation("IssueLinkSource", fields: [sourceIssueId], references: [id], onDelete: Cascade)
+  targetIssue Issue @relation("IssueLinkTarget", fields: [targetIssueId], references: [id], onDelete: Cascade)
+
+  @@index([sourceIssueId])
+  @@index([targetIssueId])
+}
+
+model IssueVersion {
+  id          String   @id @default(cuid())
+  issueId     String
+  body        String   @db.Text
+  createdById String
+  createdAt   DateTime @default(now())
+
+  issue     Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  createdBy User  @relation(fields: [createdById], references: [id])
+
+  @@index([issueId])
+  @@index([createdById])
+  @@index([createdAt])
+}
+
+model IssueDraft {
+  id      String   @id @default(cuid())
+  issueId String
+  body    String   @db.Text
+  userId  String
+  savedAt DateTime @default(now())
+
+  issue Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([issueId, userId])
+  @@index([issueId])
+  @@index([userId])
+}
+
+// ─── Comments ───────────────────────────────────────────────────────────────────
+
+model Comment {
+  id        String   @id @default(cuid())
+  issueId   String
+  body      String   @db.Text
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  issue        Issue                @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  author       User                 @relation(fields: [authorId], references: [id])
+  reactions    MessageReaction[]
+  readReceipts MessageReadReceipt[]
+
+  @@index([issueId])
+  @@index([authorId])
+  @@index([createdAt])
+}
+
+// ─── Attachments ───────────────────────────────────────────────────────────────
+
+model Attachment {
+  id           String   @id @default(cuid())
+  issueId      String
+  filename     String
+  originalName String
+  mimeType     String
+  size         Int
+  url          String
+  createdAt    DateTime @default(now())
+
+  issue Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+
+  @@index([issueId])
+  @@index([createdAt])
+}
+model MediaFile {
+  id           String   @id @default(cuid())
+  filename     String   @unique
+  originalName String
+  mimeType     String
+  sizeBytes    Int
+  url          String
+  thumbnailUrl String?
+  width        Int?
+  height       Int?
+  uploadedBy   String
+  folder       String
+  uploadedAt   DateTime @default(now())
+
+  user User @relation(fields: [uploadedBy], references: [id])
+
+  @@index([uploadedBy])
+  @@index([uploadedAt])
+  @@index([folder])
+}
+
+model IssueAttachment {
+  id         String   @id @default(cuid())
+  issueId    String
+  filename   String
+  uploadedBy String
+  uploadedAt DateTime @default(now())
+
+  issue Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [uploadedBy], references: [id])
+
+  @@unique([issueId, filename])
+  @@index([issueId])
+  @@index([uploadedBy])
+}
+// ─── Messaging / Chat ─────────────────────────────────────────────────────────
+
+model Message {
+  id        String   @id @default(cuid())
+  channelId String
+  body      String   @db.Text
+  authorId  String
+  replyToId String?
+  isPinned  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  channel      Channel              @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  author       User                 @relation(fields: [authorId], references: [id])
+  replyTo      Message?             @relation("MessageReply", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies      Message[]            @relation("MessageReply")
+  reactions    MessageReaction[]
+  readReceipts MessageReadReceipt[]
+
+  @@index([channelId])
+  @@index([authorId])
+  @@index([replyToId])
+  @@index([isPinned])
+  @@index([createdAt])
+}
+
+model MessageReaction {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  emoji     String
+  createdAt DateTime @default(now())
+
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId String?
+
+  @@unique([messageId, userId, emoji])
+  @@index([messageId])
+  @@index([userId])
+}
+
+model MessageReadReceipt {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  readAt    DateTime @default(now())
+
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId String?
+
+  @@unique([messageId, userId])
+  @@index([messageId])
+  @@index([userId])
+}
+
+model Channel {
+  id          String      @id @default(cuid())
+  name        String
+  type        ChannelType @default(PUBLIC)
+  createdById String
+  createdAt   DateTime    @default(now())
+
+  createdBy User            @relation(fields: [createdById], references: [id])
+  members   ChannelMember[]
+  messages  Message[]
+  polls     Poll[]
+
+  @@index([type])
+  @@index([createdById])
+}
+
+model ChannelMember {
+  id         String   @id @default(cuid())
+  channelId  String
+  userId     String
+  joinedAt   DateTime @default(now())
+  lastReadAt DateTime @default(now())
+
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([channelId, userId])
+  @@index([channelId])
+  @@index([userId])
+}
+
+// ─── Polls ─────────────────────────────────────────────────────────────────────
+
+model Poll {
+  id               String    @id @default(cuid())
+  title            String
+  question         String
+  type             String    @default("single")
+  anonymous        Boolean   @default(false)
+  allowChange      Boolean   @default(true)
+  minParticipation Int?
+  expiresAt        DateTime?
+  closedAt         DateTime?
+  createdById      String
+  issueId          String?
+  channelId        String?
+  createdAt        DateTime  @default(now())
+
+  createdBy User         @relation(fields: [createdById], references: [id])
+  issue     Issue?       @relation(fields: [issueId], references: [id], onDelete: SetNull)
+  channel   Channel?     @relation(fields: [channelId], references: [id], onDelete: SetNull)
+  options   PollOption[]
+  votes     PollVote[]
+
+  @@index([issueId])
+  @@index([channelId])
+  @@index([createdById])
+  @@index([expiresAt])
+}
+
+model PollOption {
+  id        String   @id @default(cuid())
+  pollId    String
+  text      String
+  createdAt DateTime @default(now())
+
+  poll  Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  votes PollVote[]
+
+  @@index([pollId])
+}
+
+model PollVote {
+  id        String   @id @default(cuid())
+  pollId    String
+  optionId  String
+  userId    String
+  createdAt DateTime @default(now())
+
+  poll   Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  option PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([pollId, optionId, userId])
+  @@index([pollId])
+  @@index([optionId])
+  @@index([userId])
+}
+
+// ─── Notifications ─────────────────────────────────────────────────────────────
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  body      String
+  data      Json     @default("{}")
+  link      String?
+  isRead    Boolean  @default(false)
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+model NotificationPreference {
+  id        String  @id @default(cuid())
+  userId    String
+  eventType String
+  enabled   Boolean @default(true)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventType])
+  @@index([userId])
+}
+
+// ─── Audit Log ─────────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String
+  entityType String
+  entityId   String
+  details    String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  issue   Issue?  @relation(fields: [issueId], references: [id], onDelete: SetNull)
+  issueId String?
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// ─── Auth Tokens ────────────────────────────────────────────────────────────────
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+}
+
+model InviteToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  role      String?
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([token])
+  @@index([expiresAt])
+}
+
+// ─── System Settings ────────────────────────────────────────────────────────────
+
+model SystemSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}

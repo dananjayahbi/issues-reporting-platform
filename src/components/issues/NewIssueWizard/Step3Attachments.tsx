@@ -1,0 +1,167 @@
+import { useCallback, useState } from "react";
+import Image from "next/image";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars  
+import { useMutation } from "@tanstack/react-query";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import axios from "axios";
+import { useDropzone } from "react-dropzone";
+import { cn } from "@/lib/utils/cn";
+import { Button } from "@/components/ui/button";
+import { Progress as _Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Upload,
+  X,
+  File,
+  Loader2 as _Loader2,
+  AlertCircle as _AlertCircle,
+} from "lucide-react";
+
+interface Attachment {
+  id: string;
+  file: File;
+  preview?: string;
+  progress: number;
+  error?: string;
+}
+
+interface Step3AttachmentsProps {
+  onAttachmentsChange?: (files: File[]) => void;
+  className?: string;
+}
+
+export function Step3Attachments({
+  onAttachmentsChange,
+  className,
+}: Step3AttachmentsProps) {
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [dragActive, setDragActive] = useState(false);
+
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      const newAttachments: Attachment[] = acceptedFiles.map((file) => {
+        const preview = file.type.startsWith("image/")
+          ? URL.createObjectURL(file)
+          : undefined;
+        return {
+          id: Math.random().toString(36).substr(2, 9),
+          file,
+          ...(preview && { preview }),
+          progress: 0,
+        };
+      });
+      setAttachments((prev) => [...prev, ...newAttachments]);
+      onAttachmentsChange?.([...attachments, ...newAttachments].map((a) => a.file));
+    },
+    [attachments, onAttachmentsChange]
+  );
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: {
+      "image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp"],
+      "application/pdf": [".pdf"],
+      "application/msword": [".doc", ".docx"],
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
+        ".xlsx",
+      ],
+    },
+  });
+
+  const removeAttachment = (id: string) => {
+    setAttachments((prev) => {
+      const filtered = prev.filter((a) => a.id !== id);
+      onAttachmentsChange?.(filtered.map((a) => a.file));
+      return filtered;
+    });
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  return (
+    <div className={cn("space-y-4", className)}>
+      {/* Upload Area */}
+      <div
+        {...getRootProps()}
+        className={cn(
+          "border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer",
+          dragActive
+            ? "border-primary bg-primary/5"
+            : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+        )}
+        onDragEnter={() => setDragActive(true)}
+        onDragLeave={() => setDragActive(false)}
+        onDrop={() => setDragActive(false)}
+      >
+        <input {...getInputProps()} />
+        <Upload className="h-10 w-10 mx-auto text-slate-400 mb-3" />
+        <p className="text-slate-600 dark:text-slate-400 mb-1">
+          Drag & drop files here, or click to select
+        </p>
+        <p className="text-sm text-slate-500">
+          Images, PDFs, Word docs, Excel files up to 10MB
+        </p>
+      </div>
+
+      {/* Attachment List */}
+      {attachments.length > 0 && (
+        <ScrollArea className="h-64">
+          <div className="space-y-2">
+            {attachments.map((attachment) => {
+              const FileIcon = attachment.file.type.startsWith("image/")
+                ? Upload
+                : File;
+              return (
+                <div
+                  key={attachment.id}
+                  className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-900"
+                >
+                  {attachment.preview ? (
+                    <Image
+                      src={attachment.preview}
+                      alt={attachment.file.name}
+                      width={10}
+                      height={10}
+                      className="h-10 w-10 rounded object-cover"
+                    />
+                  ) : (
+                    <div className="h-10 w-10 rounded bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+                      <FileIcon className="h-5 w-5 text-slate-500" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
+                      {attachment.file.name}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {formatFileSize(attachment.file.size)}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => removeAttachment(attachment.id)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              );
+            })}
+          </div>
+        </ScrollArea>
+      )}
+
+      {attachments.length === 0 && (
+        <div className="text-center py-8 text-slate-500 dark:text-slate-400">
+          <File className="h-8 w-8 mx-auto mb-2 opacity-50" />
+          <p className="text-sm">No attachments added yet</p>
+        </div>
+      )}
+    </div>
+  );
+}

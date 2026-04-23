@@ -1,0 +1,26 @@
+
+> llc-itp@0.1.0 build
+> next build
+
+   ▲ Next.js 15.5.15
+   - Environments: .env
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 4.9s
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/34) ...
+   Generating static pages (8/34) 
+Error occurred prerendering page "/notifications". Read more: https://nextjs.org/docs/messages/prerender-error
+Error: No QueryClient set, use QueryClientProvider to set one
+    at f (E:\work_git_repos\issues-reporting-platform\.next\server\chunks\1370.js:5:117134)
+    at <unknown> (E:\work_git_repos\issues-reporting-platform\.next\server\chunks\1370.js:5:107847)
+    at w (E:\work_git_repos\issues-reporting-platform\.next\server\chunks\1370.js:5:109374)
+    at h (E:\work_git_repos\issues-reporting-platform\.next\server\chunks\4613.js:1:230)
+    at M (E:\work_git_repos\issues-reporting-platform\.next\server\chunks\4613.js:1:11259) {
+  digest: '623415034'
+}
+Export encountered an error on /(app)/notifications/page: /notifications, exiting the build.
+ ⨯ Next.js build worker exited with code: 1 and signal: null
